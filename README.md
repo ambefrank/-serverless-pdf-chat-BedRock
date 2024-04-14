@@ -142,11 +142,11 @@ npm run dev -- --host 0.0.0.0
 
 Perform the following steps to create a user in the Cognito user pool:
 
- 1.Navigate to the ## Amazon Cognito console.
+ 1.Navigate to the Amazon Cognito console.
  
  2.Find the user pool with an ID matching the output provided by AWS SAM above.
  
- 3.Under Users, ## choose Create user.
+ 3.Under Users, choose Create user.
  
  4.Enter an email address and a password that adheres to the password requirements.
  
