@@ -78,10 +78,11 @@ Bedrock(
 
 Edit the following files to customize your configuration:
 
-- `sudo vi backend/src/generate_response/main.py`
-- `sudo vi backend/src/generate_embeddings/main.py`
+- ```sudo vi backend/src/generate_response/main.py```
+- ```sudo vi backend/src/generate_embeddings/main.py```
+  
 If you select models other than the default, you must also adjust the IAM permissions of the GenerateEmbeddingsFunction and GenerateResponseFunction resources in the AWS SAM template:
-- `/backend/template.yaml`
+- ```sudo vi /backend/template.yaml```
 ```
 GenerateResponseFunction:
   Type: AWS::Serverless::Function
