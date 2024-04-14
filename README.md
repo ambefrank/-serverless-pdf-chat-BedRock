@@ -67,11 +67,32 @@ cd serverless-pdf-chat
 
 ### Step 3: Configuration
 
+If you want to change the default models or Bedrock Region, edit Bedrock and BedrockEmbeddings in backend/src/generate_response/main.py and backend/src/generate_embeddings/main.py:
+
+- `Bedrock(
+   model_id="anthropic.claude-v2", #adjust to use different model
+   region_name="us-east-1", #adjust if not using us-east-1
+)`
+
 Edit the following files to customize your configuration:
 
-- `backend/src/generate_response/main.py`
-- `backend/src/generate_embeddings/main.py`
+- `sudo vi backend/src/generate_response/main.py`
+- `sudo vi backend/src/generate_embeddings/main.py`
+If you select models other than the default, you must also adjust the IAM permissions of the GenerateEmbeddingsFunction and GenerateResponseFunction resources in the AWS SAM template:
 - `/backend/template.yaml`
+- `GenerateResponseFunction:
+  Type: AWS::Serverless::Function
+  Properties:
+    # other properties
+    Policies:
+      # other policies
+      - Statement:
+          - Sid: "BedrockScopedAccess"
+            Effect: "Allow"
+            Action: "bedrock:InvokeModel"
+            Resource:
+              - "arn:aws:bedrock:*::foundation-model/anthropic.claude-v2" # adjust with different model
+              - "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1" # adjust with different model`
 
 ### Step 4: Backend Setup
 
