@@ -5,6 +5,17 @@ Great! Based on the provided command script, here's a draft README file for your
 
 ---
 
+## Key features
+
+- Amazon Bedrock for serverless embedding and inference
+- LangChain to orchestrate a Q&A LLM chain
+- FAISS vector store
+- Amazon DynamoDB for serverless conversational memory
+- AWS Lambda for serverless compute
+- Frontend built in React, TypeScript, TailwindCSS, and Vite.
+- Run locally or deploy to AWS Amplify Hosting
+- Amazon Cognito for authentication
+
 ## Installation Instructions
 
 ### Prerequisites
