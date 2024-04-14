@@ -82,7 +82,8 @@ Edit the following files to customize your configuration:
 - `sudo vi backend/src/generate_embeddings/main.py`
 If you select models other than the default, you must also adjust the IAM permissions of the GenerateEmbeddingsFunction and GenerateResponseFunction resources in the AWS SAM template:
 - `/backend/template.yaml`
-- `GenerateResponseFunction:
+```
+GenerateResponseFunction:
   Type: AWS::Serverless::Function
   Properties:
     # other properties
@@ -94,7 +95,8 @@ If you select models other than the default, you must also adjust the IAM permis
             Action: "bedrock:InvokeModel"
             Resource:
               - "arn:aws:bedrock:*::foundation-model/anthropic.claude-v2" # adjust with different model
-              - "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1" # adjust with different model`
+              - "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1" # adjust with different model
+```
 
 ### Step 4: Backend Setup
 
