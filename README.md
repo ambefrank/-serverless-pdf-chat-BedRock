@@ -127,7 +127,9 @@ sudo yum install nodejs -y
 # Install frontend dependencies
 npm ci
 
-# Run the application locally
+# Run the application locally. Running this command without the "-- --host 0.0.0.0" will run the app locally on port `http://localhost:5173` but considering you used an EC2 instance to complete this project, you would have to run the below command which will now be accessible on all network interfaces of your EC2 instance, including both `localhost` and the `public IP address` on `http://<Instance_public_IP>:5173/`.(Ensure that your EC2 instance's security group allows inbound traffic on port 5173, and you should be able to access your application from your local machine or any other machine on the internet.)
+
+```bash
 npm run dev -- --host 0.0.0.0
 ```
 
