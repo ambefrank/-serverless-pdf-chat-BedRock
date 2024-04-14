@@ -69,7 +69,8 @@ cd serverless-pdf-chat
 
 If you want to change the default models or Bedrock Region, edit Bedrock and BedrockEmbeddings in backend/src/generate_response/main.py and backend/src/generate_embeddings/main.py:
 
-```Bedrock(
+```
+Bedrock(
    model_id="anthropic.claude-v2", #adjust to use different model
    region_name="us-east-1", #adjust if not using us-east-1
 )
