@@ -113,7 +113,14 @@ cd backend
 sam build
 sam deploy --guided
 ```
+For Stack Name, choose `serverless-pdf-chat`.
 
+For the remaining options, keep the defaults by pressing the `enter` key.
+
+AWS SAM will now provision the AWS resources defined in the backend/template.yaml template. Once the deployment is completed successfully, you will see a set of output values similar to the following:
+```
+*********
+```
 ### Step 5: Frontend Setup
 
 ```bash
@@ -128,15 +135,20 @@ sudo yum install nodejs -y
 npm ci
 
 # Run the application locally. Running this command without the "-- --host 0.0.0.0" will run the app locally on port `http://localhost:5173` but considering you used an EC2 instance to complete this project, you would have to run the below command which will now be accessible on all network interfaces of your EC2 instance, including both `localhost` and the `public IP address` on `http://<Instance_public_IP>:5173/`.(Ensure that your EC2 instance's security group allows inbound traffic on port 5173, and you should be able to access your application from your local machine or any other machine on the internet.)
-
-```bash
 npm run dev -- --host 0.0.0.0
 ```
 
-### Step 6: User Creation
+### Step 6: Create a user in the Amazon Cognito user pool
 
-Navigate to the Cognito console and create a user in the user pool you configured in the `env.development` file.
+Perform the following steps to create a user in the Cognito user pool:
+
+ 1.Navigate to the Amazon Cognito console.
+ 2.Find the user pool with an ID matching the output provided by AWS SAM above.
+ 3.Under Users, choose Create user.
+ 4.Enter an email address and a password that adheres to the password requirements.
+ 5.Choose Create user.
+Change back to `http://localhost:5173` or `http://<Instance_public_IP>:5173/` and log in with the new user's credentials.
 
 ---
 
-Feel free to adjust the content as needed to fit your project's specific requirements. Let me know if you need further assistance or if there's anything else I can help you with!
+******
