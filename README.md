@@ -1,19 +1,13 @@
-# Serverless document chat application
+---
+
+# Serverless document chat application with Amazon BedRock
 
 This sample application allows you to ask natural language questions of any PDF document you upload. It combines the text generation and analysis capabilities of an LLM with a vector search of the document content. The solution uses serverless services such as [Amazon Bedrock](https://aws.amazon.com/bedrock/) to access foundational models, [AWS Lambda](https://aws.amazon.com/lambda/) to run [LangChain](https://github.com/hwchase17/langchain), and [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) for conversational memory.
-
-See the [accompanying blog post on the AWS Serverless Blog](https://aws.amazon.com/blogs/compute/building-a-serverless-document-chat-with-aws-lambda-and-amazon-bedrock/) for a detailed description and follow the deployment instructions below to get started.
 
 <p float="left">
   <img src="preview-1.png" width="49%" />
   <img src="preview-2.png" width="49%" />
 </p>
-
-> **Warning**
-> This application is not ready for production use. It was written for demonstration and educational purposes. Review the [Security](#security) section of this README and consult with your security team before deploying this stack. No warranty is implied in this example.
-
-> **Note**
-> This architecture creates resources that have costs associated with them. Please see the [AWS Pricing](https://aws.amazon.com/pricing/) page for details and make sure to understand the costs before deploying this stack.
 
 ## Key features
 
@@ -35,19 +29,53 @@ See the [accompanying blog post on the AWS Serverless Blog](https://aws.amazon.c
 1. When a user chats with a PDF document and sends a prompt to the backend, a Lambda function retrieves the index from S3 and searches for information related to the prompt.
 1. A LLM then uses the results of this vector search, previous messages in the conversation, and its general-purpose capabilities to formulate a response to the user.
 
-## Deployment instructions
+## Installation Instructions
 
 ### Prerequisites
 
-- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
-- [Python](https://www.python.org/) 3.11 or greater
+- Python 3.11
+- AWS CLI
+- SAM CLI
+- Git
+- Node.js and npm
 
-### Cloning the repository
+### Step 1: Install Dependencies
 
-Clone this repository:
+```bash
+# Install Python 3.11
+sudo dnf install python3.11 -y
+
+# Install pip for Python 3.11
+sudo dnf install python3.11-pip -y
+
+# Verify Python 3.11 installation
+python3.11 --version
+
+# Uninstall older version of AWS CLI (if exists)
+sudo yum remove awscli -y
+
+# Install latest AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# Download and install SAM CLI
+wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+sudo ./sam-installation/install
+
+#Configure AWS CLI
+aws configure
+
+# Install git
+sudo yum install git -y
+```
+
+### Step 2: Clone the Repository
 
 ```bash
 git clone https://github.com/aws-samples/serverless-pdf-chat.git
+cd serverless-pdf-chat
 ```
 
 ### Amazon Bedrock setup
@@ -68,8 +96,23 @@ Bedrock(
    region_name="us-east-1", #adjust if not using us-east-1
 )
 ```
+Edit the following files to customize your configuration:
+
+```bash
+sudo vi backend/src/generate_response/main.py
+```
+
+```bash
+sudo vi backend/src/generate_embeddings/main.py
+```
 
 If you select models other than the default, you must also adjust the IAM permissions of the `GenerateEmbeddingsFunction` and `GenerateResponseFunction` resources in the AWS SAM template:
+
+Edit the following files to customize your configuration:
+
+```bash
+  sudo vi /backend/template.yaml
+```
 
 ```yaml
 GenerateResponseFunction:
@@ -88,75 +131,42 @@ GenerateResponseFunction:
 ```
 
 ### Deploy the application with AWS SAM
+### Step 4: Backend Setup
 
-1. Change to the `backend` directory and [build](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) the application:
+```bash
+cd backend
+sam build
+sam deploy --guided
+```
+For **Stack Name**, choose `serverless-pdf-chat`.
 
-   ```bash
-   cd backend
-   sam build
-   ```
-
-1. [Deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html) the application into your AWS account:
-
-   ```bash
-   sam deploy --guided
-   ```
-
-1. For **Stack Name**, choose `serverless-pdf-chat`.
-
-1. For the remaining options, keep the defaults by pressing the enter key.
+For the remaining options, keep the defaults by pressing the **enter** key.
 
 AWS SAM will now provision the AWS resources defined in the `backend/template.yaml` template. Once the deployment is completed successfully, you will see a set of output values similar to the following:
 
-```bash
-CloudFormation outputs from deployed stack
--------------------------------------------------------------------------------
-Outputs
--------------------------------------------------------------------------------
-Key                 CognitoUserPool
-Description         -
-Value               us-east-1_gxKtRocFs
+![Serverless PDF Chat architecture](architecture.png "Serverless PDF Chat architecture")
 
-Key                 CognitoUserPoolClient
-Description         -
-Value               874ghcej99f8iuo0lgdpbrmi76k
-
-Key                 ApiGatewayBaseUrl
-Description         -
-Value               https://abcd1234.execute-api.us-east-1.amazonaws.com/dev/
--------------------------------------------------------------------------------
-```
-
-You can find the same outputs in the `Outputs` tab of the `serverless-pdf-chat` stack in the AWS CloudFormation console. In the next section, you will use these outputs to run the React frontend locally and connect to the deployed resources in AWS.
-
-### Run the React frontend locally
-
-Create a file named `.env.development` in the `frontend` directory. [Vite will use this file](https://vitejs.dev/guide/env-and-mode.html) to set up environment variables when we run the application locally.
-
-Copy the following file content and replace the values with the outputs provided by AWS SAM:
-
-```plaintext
-VITE_REGION=us-east-1
-VITE_API_ENDPOINT=https://abcd1234.execute-api.us-east-1.amazonaws.com/dev/
-VITE_USER_POOL_ID=us-east-1_gxKtRocFs
-VITE_USER_POOL_CLIENT_ID=874ghcej99f8iuo0lgdpbrmi76k
-```
-
-Next, install the frontend's dependencies by running the following command in the `frontend` directory:
+### Step 5: Frontend Setup
 
 ```bash
+cd ../frontend/
+sudo touch env.development
+echo -e "VITE_REGION=us-east-1\nVITE_API_ENDPOINT=https://abcd1234.execute-api.us-east-1.amazonaws.com/dev/\nVITE_USER_POOL_ID=us-east-1_gxKtRocFs\nVITE_USER_POOL_CLIENT_ID=874ghcej99f8iuo0lgdpbrmi76k" | sudo tee -a env.development
+
+# Install Node.js and npm
+sudo yum install nodejs -y
+
+# Install frontend dependencies
 npm ci
+
+# Run the application locally. If you wanna run this app locally, use the below command without **-- --host 0.0.0.0** which makes the app accessible on **http://localhost:5173/**, but considering you're using an EC2 instance then you would have to run below, which means it's now accessible on all network interfaces of your EC2 instance, including both **localhost** and the **Public_IP_address** of your inatance on **http://<instance_public_IP>:5173/**
+npm run dev -- --host 0.0.0.0
 ```
+**NOTE:** Ensure that your EC2 instance's security group allows inbound traffic on port 5173, and you should be able to access your application from your local machine or any other machine on the internet.
 
-Finally, to start the application locally, run the following command in the `frontend` directory:
+You can access the application on **http://localhost:5173/** if you ran it locally (if you ran **npm run dev**) or on **http://<instance_public_IP>:5173/** (if you ran **npm run dev -- --host 0.0.0.0** )
 
-```bash
-npm run dev
-```
-
-Vite will now start the application under `http://localhost:5173`. As the application uses Amazon Cognito for authentication, you will be greeted by a login screen. In the next step, you will create a user to access the application.
-
-### Create a user in the Amazon Cognito user pool
+### Step 6: Create a user in the Amazon Cognito user pool
 
 Perform the following steps to create a user in the Cognito user pool:
 
@@ -166,90 +176,16 @@ Perform the following steps to create a user in the Cognito user pool:
 1. Enter an email address and a password that adheres to the password requirements.
 1. Choose **Create user**.
 
-Change back to `http://localhost:5173` and log in with the new user's credentials.
-
-### Optional: Deploying the frontend with AWS Amplify Hosting
-
-You can optionally deploy the React frontend with [Amplify Hosting](https://aws.amazon.com/amplify/hosting/). Amplify Hosting enables a fully-managed deployment of the React frontend in an AWS-managed account using Amazon S3 and Amazon CloudFront.
-
-To set up Amplify Hosting:
-
-1. Fork this GitHub repository and take note of your repository URL, for example `https://github.com/user/serverless-pdf-chat/`.
-1. Create a GitHub fine-grained access token for the new repository by following [this guide](https://docs.aws.amazon.com/amplify/latest/userguide/setting-up-GitHub-access.html). For the **Repository permissions**, select **Read and write** for **Content** and **Webhooks**.
-1. Create a new secret called `serverless-pdf-chat-github-token` in AWS Secrets Manager and input your fine-grained access token as plaintext. Select the **Plaintext** tab and confirm your secret looks like this:
-
-   ```json
-   github_pat_T2wyo------------------------------------------------------------------------rs0Pp
-   ```
-
-1. Run the following command in the `backend` directory to prepare the application for deployment:
-
-   ```bash
-   sam build
-   ```
-
-1. Next, to edit the AWS SAM deploy configuration, run the following command:
-
-   ```bash
-   sam deploy --guided
-   ```
-
-1. This time, for **Parameter Frontend**, input **amplify**.
-1. For **Parameter Repository**, input the URL of your forked GitHub repository.
-1. Leave all other options unchanged by pressing the enter key.
-
-AWS SAM will now deploy the React frontend with Amplify Hosting. Navigate to the Amplify console to check the build status. If the build does not start automatically, trigger it via the Amplify console.
+Change back to `http://localhost:5173/` or `http://<instance_public_IP>:5173/` and log in with the new user's credentials.
 
 ## Cleanup
 
-1. Delete any secrets in AWS Secrets Manager created as part of this walkthrough.
 1. [Empty the Amazon S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/empty-bucket.html) created as part of the AWS SAM template.
-1. Run the following command in the `backend` directory of the project to delete all associated resources resources:
+2. Run the following command in the `backend` directory of the project to delete all associated resources resources:
 
    ```bash
    sam delete
    ```
-## Troubleshooting
 
-If you are experiencing issues when running the [`sam build`](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) command, try setting the `--use-container` flag (requires Docker):
-
-```bash
-sam build --use-container
-```
-
-If you are still experiencing issues despite using `--use-container`, try switching the AWS Lambda functions from `arm64` to `x86_64` in the `backend/template.yaml` (as well as switching to the `x_86_64` version of Powertools):
-
-```yaml
-Globals:
-  Function:
-    Runtime: python3.11
-    Handler: main.lambda_handler
-    Architectures:
-      - x86_64
-    Tracing: Active
-    Environment:
-      Variables:
-        LOG_LEVEL: INFO
-    Layers:
-      - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:51
-```
-
-## Security
-
-This application was written for demonstration and educational purposes and not for production use. The [Security Pillar of the AWS Well-Architected Framework](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html) can support you in further adopting the sample into a production deployment in addition to your own established processes. Take note of the following:
-
-- The application uses encryption in transit and at rest with AWS-managed keys where applicable. Optionally, use [AWS KMS](https://aws.amazon.com/kms/) with [DynamoDB](https://docs.aws.amazon.com/kms/latest/developerguide/services-dynamodb.html), [SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-server-side-encryption.html), and [S3](https://docs.aws.amazon.com/kms/latest/developerguide/services-s3.html) for more control over encryption keys.
-
-- This application uses [Powertools for AWS Lambda (Python)](https://github.com/aws-powertools/powertools-lambda-python) to log to inputs and ouputs to CloudWatch Logs. Per default, this can include sensitive data contained in user input. Adjust the log level and remove log statements to fit your security requirements.
-
-- [API Gateway access logging](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-using-console) and [usage plans](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html) are not activiated in this code sample. Similarly, [S3 access logging](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-loggingconfig.html) is currently not enabled.
-
-- In order to simplify the setup of the demo, this solution uses AWS managed policies associated to IAM roles that contain wildcards on resources. Please consider to further scope down the policies as you see fit according to your needs. Please note that there is a resource wildcard on the AWS managed `AWSLambdaSQSQueueExecutionRole`. This is a known behaviour, see [this GitHub issue](https://github.com/aws/serverless-application-model/issues/2118) for details.
-
-- If your security controls require inspecting network traffic, consider [adjusting the AWS SAM template](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html) to attach the Lambda functions to a VPC via its [`VpcConfig`](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-lambda-function-vpcconfig.html).
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
-## License
-
-This library is licensed under the MIT-0 License. See the [LICENSE](LICENSE) file.
+   **Congratulations, you Successfully Completed this project !!**
+---
