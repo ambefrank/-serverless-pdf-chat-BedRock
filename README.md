@@ -146,8 +146,9 @@ AWS SAM will now provision the AWS resources defined in the `backend/template.ya
 
 <p float="left">
   <img src="Sam_Build.JPG" width="49%" />
-  <img src="Backend_stack_deployment.jpg" width="49%" />
+  <img src="Backend_stack_deployment.JPG" width="49%" />
 </p>
+
 ### Step 5: Frontend Setup
 
 ```bash
@@ -179,6 +180,8 @@ Perform the following steps to create a user in the Cognito user pool:
 1. Choose **Create user**.
 
 Change back to `http://localhost:5173/` or `http://<instance_public_IP>:5173/` and log in with the new user's credentials.
+
+![Serverless PDF Chat architecture](Frontend_capture.JPG "Serverless PDF Chat architecture")
 
 ## Cleanup
 
