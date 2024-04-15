@@ -144,8 +144,10 @@ For the remaining options, keep the defaults by pressing the **enter** key.
 
 AWS SAM will now provision the AWS resources defined in the `backend/template.yaml` template. Once the deployment is completed successfully, you will see a set of output values similar to the following:
 
-![Serverless PDF Chat architecture](architecture.png "Serverless PDF Chat architecture")
-
+<p float="left">
+  <img src="Sam_Build.JPG" width="49%" />
+  <img src="Backend_stack_deployment.jpg" width="49%" />
+</p>
 ### Step 5: Frontend Setup
 
 ```bash
